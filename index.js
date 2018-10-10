@@ -79,22 +79,32 @@ const runConditional = (imdbId, opts, res) => {
 				.then(res => downloads(res, opts));
 };
 
-const yifysubtitles = (imdbId, opts) => {
-	opts = Object.assign({
-		path: __dirname,
-		langs: ['en'],
-		concurrency: Infinity,
-		format: 'vtt'
-	}, opts);
+const yifysubtitles = {
+	get: (imdbId) => {
+		return scrape(imdbId);
+	},
 
-	if (opts.langs.constructor !== Array) {
-		throw new TypeError('Expected `langs` to be an array');
-	} else if (opts.langs.some(lang => langK.indexOf(lang) === -1)) {
-		throw new TypeError(`Expected \`langs\` members to be in ${langK}`);
+	getByLang: (imdbId, lang) => {
+		return scrape(imdbId).filter(sub => sub.language == lang);
+	},
+
+	download: (imdbId, opts) => {
+		opts = Object.assign({
+			path: __dirname,
+			langs: ['en'],
+			concurrency: Infinity,
+			format: 'vtt'
+		}, opts);
+	
+		if (opts.langs.constructor !== Array) {
+			throw new TypeError('Expected `langs` to be an array');
+		} else if (opts.langs.some(lang => langK.indexOf(lang) === -1)) {
+			throw new TypeError(`Expected \`langs\` members to be in ${langK}`);
+		}
+	
+		return scrape(imdbId)
+			.then(res => res.length ? runConditional(imdbId, opts, res) : []);
 	}
-
-	return scrape(imdbId)
-		.then(res => res.length ? runConditional(imdbId, opts, res) : []);
 };
 
 module.exports = yifysubtitles;

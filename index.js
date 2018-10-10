@@ -26,6 +26,7 @@ const scrape = imdbId => {
 			return $('tbody tr').map((i, el) => {
 				const $el = $(el);
 				return {
+					title: $el.find('.flag-cell').next().find('a').text(),
 					rating: $el.find('.rating-cell').text(),
 					language: $el.find('.flag-cell .sub-lang').text().toLowerCase(),
 					url: $el.find('.download-cell a').attr('href').replace('subtitles/', 'subtitle/') + '.zip'
